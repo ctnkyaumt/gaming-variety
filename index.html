@@ -1,618 +1,620 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gaming Variety Score</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gaming Variety Score</title>
+  <style>
+    /* Reset and global styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-            color: #333;
-        }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: #333;
+    }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(10px);
-        }
+    /* Container for all content */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+    }
 
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            position: relative;
-        }
+    /* Header: title, subtitle, and tabs */
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      position: relative;
+    }
 
-        .title {
-            font-size: 2.5rem;
-            font-weight: bold;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 10px;
-        }
+    .title {
+      font-size: 2.5rem;
+      font-weight: bold;
+      background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+    }
 
-        .subtitle {
-            font-size: 1.1rem;
-            color: #666;
-            margin-bottom: 20px;
-        }
+    .subtitle {
+      font-size: 1.1rem;
+      color: #666;
+      margin-bottom: 20px;
+    }
 
-        .score-display {
-            background: linear-gradient(45deg, #ff9a9e, #fecfef);
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            text-align: center;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
+    /* Tabs for switching between AAA and Indie lists */
+    .tabs {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+      margin-bottom: 15px;
+      gap: 10px;
+    }
 
-        .score-number {
-            font-size: 3rem;
-            font-weight: bold;
-            color: #fff;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
+    .tab-button {
+      background: #f0f0f0;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
 
-        .score-label {
-            font-size: 1.2rem;
-            color: #fff;
-            margin-top: 10px;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-        }
+    .tab-button:hover {
+      background: #e8e8e8;
+    }
 
-        .games-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
+    .tab-button.active {
+      background: #667eea;
+      border-color: #4ecdc4;
+      color: #fff;
+    }
 
-        .game-item {
-            background: #fff;
-            padding: 15px;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
-            cursor: pointer; /* makes the whole card appear clickable */
-        }
+    /* Sticky header that holds the score box and progress bar */
+    .sticky-header {
+      position: sticky;
+      top: 0;
+      background: #fff;
+      z-index: 100;
+      padding-top: 20px;
+      padding-bottom: 10px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
 
-        .game-item:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-            border-color: #667eea;
-        }
+    /* Revised score display: percentage, “#/200” in center, and remaining on right */
+    .score-display {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(45deg, #ff9a9e, #fecfef);
+      border-radius: 12px;
+      padding: 10px 20px;      /* Reduced vertical padding for a shorter box */
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      margin-bottom: 15px;     /* Space between this box and progress bar */
+    }
 
-        .game-item.checked {
-            background: linear-gradient(45deg, #a8edea, #fed6e3);
-            border-color: #4ecdc4;
-        }
+    .score-percentage {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #fff;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.25);
+    }
 
-        .game-checkbox {
-            display: flex;
-            align-items: center;
-            user-select: none;
-        }
+    .score-center {
+      text-align: center;
+    }
 
-        .game-checkbox input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            margin-right: 12px;
-            cursor: pointer;
-            accent-color: #4ecdc4;
-        }
+    .score-center .score-number {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #fff;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
 
-        .game-checkbox label {
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            flex: 1;
-            color: #333;
-        }
+    .score-center .score-label {
+      font-size: 1rem;
+      color: #fff;
+      margin-top: 2px;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    }
 
-        .progress-bar {
-            background: #e0e0e0;
-            height: 10px;
-            border-radius: 5px;
-            overflow: hidden;
-            margin: 20px 0;
-        }
+    .score-remaining {
+      font-size: 1rem;
+      font-weight: 500;
+      color: #fff;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.25);
+    }
 
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #ff9a9e, #fecfef, #4ecdc4);
-            transition: width 0.5s ease;
-            border-radius: 5px;
-        }
+    /* Progress bar below the score box */
+    .progress-bar {
+      background: #e0e0e0;
+      height: 10px;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-bottom: 30px;
+    }
 
-        .stats {
-            display: flex;
-            justify-content: space-around;
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 12px;
-            margin-top: 20px;
-        }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #ff9a9e, #fecfef, #4ecdc4);
+      transition: width 0.5s ease;
+      border-radius: 5px;
+    }
 
-        .stat-item {
-            text-align: center;
-        }
+    /* Grid for game‐checkbox cards */
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
 
-        .stat-number {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #333;
-        }
+    .game-item {
+      background: #fff;
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+      cursor: pointer;
+    }
 
-        .stat-label {
-            font-size: 0.9rem;
-            color: #666;
-            margin-top: 5px;
-        }
+    .game-item:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      border-color: #667eea;
+    }
 
-        @media (max-width: 768px) {
-            .title {
-                font-size: 2rem;
-            }
-            
-            .games-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .stats {
-                flex-direction: column;
-                gap: 15px;
-            }
-        }
+    .game-item.checked {
+      background: linear-gradient(45deg, #a8edea, #fed6e3);
+      border-color: #4ecdc4;
+    }
 
-        .celebration {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 2rem;
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.5s ease;
-            z-index: 1000;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 20px 40px;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(10px);
-            text-align: center;
-            font-weight: bold;
-            color: #333;
-            animation-duration: 0.5s;
-            animation-fill-mode: both;
-        }
+    .game-checkbox {
+      display: flex;
+      align-items: center;
+      user-select: none;
+    }
 
-        .celebration.show {
-            opacity: 1;
-            animation-name: celebrationPop;
-        }
+    .game-checkbox input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin-right: 12px;
+      cursor: pointer;
+      accent-color: #4ecdc4;
+    }
 
-        @keyframes celebrationPop {
-            0% {
-                transform: translate(-50%, -50%) scale(0.5) rotate(-10deg);
-                opacity: 0;
-            }
-            50% {
-                transform: translate(-50%, -50%) scale(1.1) rotate(5deg);
-            }
-            100% {
-                transform: translate(-50%, -50%) scale(1) rotate(0deg);
-                opacity: 1;
-            }
-        }
-		
-		.sticky-header {
-			position: sticky;
-			top: 0;
-			background: #fff;
-			z-index: 100;
-			padding-top: 20px;
-			padding-bottom: 10px;
-			margin-bottom: 15px;    /* ← new: pushes the game grid down */
-			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-		}
-		
-		/* === TABS STYLE === */
-		.tabs {
-			display: flex;
-			justify-content: center;
-			margin-top: 20px;
-			margin-bottom: 15px;
-			gap: 10px;
-		}
+    .game-checkbox label {
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      flex: 1;
+      color: #333;
+    }
 
-		.tab-button {
-			background: #f0f0f0;
-			border: 2px solid #ccc;
-			border-radius: 8px;
-			padding: 8px 16px;
-			font-size: 1rem;
-			font-weight: 500;
-			cursor: pointer;
-			transition: background 0.2s, border-color 0.2s;
-		}
+    /* Celebration overlay for milestone pop‐ups */
+    .celebration {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 2rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.5s ease;
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 20px 40px;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+      text-align: center;
+      font-weight: bold;
+      color: #333;
+      animation-duration: 0.5s;
+      animation-fill-mode: both;
+    }
 
-		.tab-button:hover {
-			background: #e8e8e8;
-		}
+    .celebration.show {
+      opacity: 1;
+      animation-name: celebrationPop;
+    }
 
-		.tab-button.active {
-			background: #667eea;       /* match your header gradient’s main color */
-			border-color: #4ecdc4;     /* or whichever accent you prefer */
-			color: #fff;
-		}
+    @keyframes celebrationPop {
+      0% {
+        transform: translate(-50%, -50%) scale(0.5) rotate(-10deg);
+        opacity: 0;
+      }
+      50% {
+        transform: translate(-50%, -50%) scale(1.1) rotate(5deg);
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(1) rotate(0deg);
+        opacity: 1;
+      }
+    }
 
-    </style>
+    /* Responsive tweaks */
+    @media (max-width: 768px) {
+      .title {
+        font-size: 2rem;
+      }
+      .games-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
+
 <body>
-    <div class="container">
-        <div class="header">
-            <h1 class="title">What is your VARIETY gamer score?</h1>
-            <p class="subtitle">Which of these Video Game series did you play (at least 1 game of)? 1 point per box checked!</p>
-			<!-- TABS: AAA vs. Indie -->
-			<div class="tabs">
-				<button id="tabAAA" class="tab-button active">AAA</button>
-				<button id="tabIndie" class="tab-button">Indie</button>
-			</div>
-        </div>
-
-        <div class="sticky-header">
-			<div class="score-display">
-				<div class="score-number" id="score">0</div>
-				<div class="score-label">out of 100</div>
-			</div>
-
-			<div class="progress-bar">
-				<div class="progress-fill" id="progressFill" style="width: 0%"></div>
-			</div>
-		</div>
-
-        <!-- AAA CONTAINER -->
-		<div id="AAAcontainer">
-			<div class="games-grid" id="gamesGrid">
-				<!-- (existing AAA items will be populated here via JavaScript) -->
-			</div>
-		</div>
-
-		<!-- INDIE CONTAINER (initially hidden) -->
-		<div id="Indiecontainer" style="display: none;">
-			<div class="games-grid" id="indieGrid">
-				<!-- (“Indie” checkboxes will be populated here via JavaScript) -->
-			</div>
-		</div>
-
-        <div class="stats">
-            <div class="stat-item">
-                <div class="stat-number" id="checkedCount">0</div>
-                <div class="stat-label">Games Played</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number" id="percentage">0%</div>
-                <div class="stat-label">Completion</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number" id="remainingCount">100</div>
-                <div class="stat-label">Remaining</div>
-            </div>
-        </div>
+  <div class="container">
+    <!-- Header with title, subtitle, and tabs -->
+    <div class="header">
+      <h1 class="title">What is your VARIETY gamer score?</h1>
+      <p class="subtitle">
+        Which of these Video Game series did you play (at least 1 game of)? 1 point per box checked!
+      </p>
+      <div class="tabs">
+        <button id="tabAAA" class="tab-button active">AAA</button>
+        <button id="tabIndie" class="tab-button">Indie</button>
+      </div>
     </div>
 
-    <div class="celebration" id="celebration">🎮✨</div>
+    <!-- Sticky header: score display + progress bar -->
+    <div class="sticky-header">
+      <div class="score-display">
+        <div class="score-percentage" id="percentage">0%</div>
+        <div class="score-center">
+          <div class="score-number" id="score">0</div>
+          <div class="score-label">/ 200</div>
+        </div>
+        <div class="score-remaining">
+          <span id="remainingCount">200</span> Remaining
+        </div>
+      </div>
 
-    <script>
-        // 1) TWO SEPARATE ARRAYS: AAA vs. Indie
-		const aaaGames = [
-			"Mario Bros.", "Final Fantasy", "Dragon Quest", "Mortal Kombat",
-			"Legend of Zelda", "Pikmin", "Halo", "Megaman",
-			"Pokémon", "Tales of...", "GTA", "Uncharted",
-			"Warcraft", "Of Mana", "Diablo", "Tomb Raider",
-			"The Elder Scrolls", "Metal Gear", "Assassin's Creed", "Portal",
-			"Fallout", "God Of War", "Metroid", "Sonic the Hedgehog",
-			"Doom", "Tetris", "Bioshock", "The Witcher",
-			"Kingdom Hearts", "Red Dead Redemp.", "Mass Effect", "Half-Life",
-			"Crash Bandicoot", "Street Fighter", "Star Fox", "Spyro the Dragon",
-			"Donkey Kong", "Chrono Series", "Last of Us", "Dark Souls",
-			"Tekken", "Rachet and Clank", "Fire Emblem", "Devil May Cry",
-			"Borderlands", "Call of Duty", "Far Cry", "Silent Hill",
-			"The Sims", "Age of Empires", "Resident Evil", "Hitman",
-			"Dead Space", "Need for Speed", "Tony Hawk Pro.", "Dragon Age",
-			"Animal Crossing", "Harvest Moon", "Gran Turismo", "Gears of War",
-			"Fable", "Prince of Persia", "Rayman", "Banjo-Kazooie",
-			"Contra", "Max Payne", "Castlevania", "Counter-Strike",
-			"Team Fortress", "Ninja Gaiden", "Soul Calibur", "Worms",
-			"Punch-Out", "Persona", "SMT", "Shadow Hearts",
-			"Saints Row", "Bayonetta", "Yakuza", "Bomberman",
-			"Jak and Daxter", "Medal of Honor", "Com. and Conq.", "Monster Hunter",
-			"Guilty Gear", "Dead or Alive", "SaGa", "Shenmue",
-			"Starcraft", "Deus Ex", "Total War", "Watch Dogs",
-			"Nier", "Drakengard", "Phantasy Star", "Dishonored",
-			"Warhammer", "Breath of Fire", "Parasite Eve", "Wild Arms"
-		];
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+      </div>
+    </div>
 
-		const indieGames = [
-			"Fez", "Super Meat Boy", "VA-11 HALL-A", "Devil Daggers", "Overcooked",
-			"Towerfall", "Observer", "Slime Rancher", "No Man’s Sky", "Oxenfree",
-			"Superhot", "Thomas Was Alone", "Steamworld", "A Hat in Time", "Hades",
-			"Hollow Knight", "Terraria", "Path of Exile", "Cave Story", "Don’t Starve",
-			"Bastion", "Coffee Talk", "Braid", "Darkest Dungeon", "Castle Crashers",
+    <!-- AAA games container (visible by default) -->
+    <div id="AAAcontainer">
+      <div class="games-grid" id="gamesGrid">
+        <!-- AAA checkboxes will be populated here via JavaScript -->
+      </div>
+    </div>
 
-			"Machinarium", "World of Goo", "Audiosurf", "Frog Detective", "Amnesia",
-			"Binding of Isaac", "The Banner Saga", "Dead Cells", "Subnautica",
-			"Super Hexagon", "Behind the Frame", "Slay the Spire", "Cuphead",
-			"Among Us", "The Messenger", "Night in the Woods", "Ape Out",
-			"Rocket League", "Firewatch", "Skullgirls", "Unpacking", "Katana Zero",
-			"Stardew Valley", "Bloodstained", "Townscaper",
+    <!-- Indie games container (hidden initially) -->
+    <div id="Indiecontainer" style="display: none;">
+      <div class="games-grid" id="indieGrid">
+        <!-- Indie checkboxes will be populated here via JavaScript -->
+      </div>
+    </div>
+  </div>
 
-			"Nidhogg", "Limbo", "Mount And Blade", "Disco Elysium", "FTL",
-			"Guacamelee", "Hyper Light Drifter", "Mighty No. 9", "Yuppie Psycho",
-			"Gone Home", "Papers, Please", "Hotline Miami", "Divinity", "A Way Out",
-			"Paradise Killer", "Fall Guys", "Minecraft", "Spelunky", "Furi",
-			"Monster Prom", "Yume Nikki", "Dear Esther", "Outer Wilds", "Armello",
+  <!-- Celebration overlay -->
+  <div class="celebration" id="celebration">🎮✨</div>
 
-			"Boyfriend Dungeon", "Pathologic", "Rain World", "Calico", "Edith Finch",
-			"Untitled Goose Game", "Journey", "Getting Over It", "Celeste", "Undertale",
-			"Phasmophobia", "The Stanley Parable", "Shovel Knight", "Devotion",
-			"Kerbal Space Program", "PUBG", "Beat Saber", "Mutazione",
-			"Salt & Sanctuary", "Five Nights at Freddy’s", "Garry’s Mod",
-			"Inscryption", "Helltaker", "A Short Hike", "PowerWash Simulator"
-		];
+  <script>
+    // 1) Define two separate arrays: AAA and Indie
+    const aaaGames = [
+      "Mario Bros.", "Final Fantasy", "Dragon Quest", "Mortal Kombat",
+      "Legend of Zelda", "Pikmin", "Halo", "Megaman",
+      "Pokémon", "Tales of...", "GTA", "Uncharted",
+      "Warcraft", "Of Mana", "Diablo", "Tomb Raider",
+      "The Elder Scrolls", "Metal Gear", "Assassin's Creed", "Portal",
+      "Fallout", "God Of War", "Metroid", "Sonic the Hedgehog",
+      "Doom", "Tetris", "Bioshock", "The Witcher",
+      "Kingdom Hearts", "Red Dead Redemp.", "Mass Effect", "Half-Life",
+      "Crash Bandicoot", "Street Fighter", "Star Fox", "Spyro the Dragon",
+      "Donkey Kong", "Chrono Series", "Last of Us", "Dark Souls",
+      "Tekken", "Rachet and Clank", "Fire Emblem", "Devil May Cry",
+      "Borderlands", "Call of Duty", "Far Cry", "Silent Hill",
+      "The Sims", "Age of Empires", "Resident Evil", "Hitman",
+      "Dead Space", "Need for Speed", "Tony Hawk Pro.", "Dragon Age",
+      "Animal Crossing", "Harvest Moon", "Gran Turismo", "Gears of War",
+      "Fable", "Prince of Persia", "Rayman", "Banjo-Kazooie",
+      "Contra", "Max Payne", "Castlevania", "Counter-Strike",
+      "Team Fortress", "Ninja Gaiden", "Soul Calibur", "Worms",
+      "Punch-Out", "Persona", "SMT", "Shadow Hearts",
+      "Saints Row", "Bayonetta", "Yakuza", "Bomberman",
+      "Jak and Daxter", "Medal of Honor", "Com. and Conq.", "Monster Hunter",
+      "Guilty Gear", "Dead or Alive", "SaGa", "Shenmue",
+      "Starcraft", "Deus Ex", "Total War", "Watch Dogs",
+      "Nier", "Drakengard", "Phantasy Star", "Dishonored",
+      "Warhammer", "Breath of Fire", "Parasite Eve", "Wild Arms"
+    ];
 
-		// 2) GLOBAL SCORE VARIABLES (unchanged logic)
-		let score = 0;
-		const totalGames = aaaGames.length + indieGames.length;
-		let celebrationQueue = [];
-		let isCelebrating = false;
+    const indieGames = [
+      "Fez", "Super Meat Boy", "VA-11 HALL-A", "Devil Daggers", "Overcooked",
+      "Towerfall", "Observer", "Slime Rancher", "No Man’s Sky", "Oxenfree",
+      "Superhot", "Thomas Was Alone", "Steamworld", "A Hat in Time", "Hades",
+      "Hollow Knight", "Terraria", "Path of Exile", "Cave Story", "Don’t Starve",
+      "Bastion", "Coffee Talk", "Braid", "Darkest Dungeon", "Castle Crashers",
 
-        /**
-		 * Creates a grid of checkboxes inside the given container ID.
-		 * @param {string} containerId   – The ID of the DIV that wraps a .games-grid
-		 * @param {string[]} listOfGames – The array of game‐names to turn into checkboxes
-		 */
-		function createGameItems(containerId, listOfGames) {
-			const gridWrapper = document.getElementById(containerId);
-			const grid = gridWrapper.querySelector('.games-grid');
+      "Machinarium", "World of Goo", "Audiosurf", "Frog Detective", "Amnesia",
+      "Binding of Isaac", "The Banner Saga", "Dead Cells", "Subnautica",
+      "Super Hexagon", "Behind the Frame", "Slay the Spire", "Cuphead",
+      "Among Us", "The Messenger", "Night in the Woods", "Ape Out",
+      "Rocket League", "Firewatch", "Skullgirls", "Unpacking", "Katana Zero",
+      "Stardew Valley", "Bloodstained", "Townscaper",
 
-			listOfGames.forEach((game, index) => {
-				// Create a .game-item wrapper
-				const gameItem = document.createElement('div');
-				gameItem.className = 'game-item';
+      "Nidhogg", "Limbo", "Mount And Blade", "Disco Elysium", "FTL",
+      "Guacamelee", "Hyper Light Drifter", "Mighty No. 9", "Yuppie Psycho",
+      "Gone Home", "Papers, Please", "Hotline Miami", "Divinity", "A Way Out",
+      "Paradise Killer", "Fall Guys", "Minecraft", "Spelunky", "Furi",
+      "Monster Prom", "Yume Nikki", "Dear Esther", "Outer Wilds", "Armello",
 
-				// Create a unique ID for each checkbox
-				const inputId = `${containerId}-game-${index}`;
+      "Boyfriend Dungeon", "Pathologic", "Rain World", "Calico", "Edith Finch",
+      "Untitled Goose Game", "Journey", "Getting Over It", "Celeste",
+      "Undertale", "Phasmophobia", "The Stanley Parable", "Shovel Knight",
+      "Devotion", "Kerbal Space Program", "PUBG", "Beat Saber", "Mutazione",
+      "Salt & Sanctuary", "Five Nights at Freddy’s", "Garry’s Mod",
+      "Inscryption", "Helltaker", "A Short Hike", "PowerWash Simulator"
+    ];
 
-				// Insert checkbox + label HTML
-				gameItem.innerHTML = `
-					<div class="game-checkbox">
-						<input type="checkbox" id="${inputId}">
-						<label for="${inputId}">${game}</label>
-					</div>
-				`;
-				grid.appendChild(gameItem);
+    // 2) Global score variables
+    let score = 0;
+    const totalGames = aaaGames.length + indieGames.length; // 200
 
-				// Grab references to the checkbox + its label
-				const checkbox = gameItem.querySelector('input[type="checkbox"]');
-				const label    = gameItem.querySelector('label');
+    /**
+     * Creates a grid of checkboxes inside the given container ID.
+     * @param {string} containerId   – The ID of the DIV that wraps a .games-grid
+     * @param {string[]} listOfGames – The array of game‐names to turn into checkboxes
+     */
+    function createGameItems(containerId, listOfGames) {
+      const gridWrapper = document.getElementById(containerId);
+      const grid = gridWrapper.querySelector('.games-grid');
 
-				// Prevent card‐click handler when clicking directly on the label
-				label.addEventListener('click', function(e) {
-					e.stopPropagation();
-				});
+      listOfGames.forEach((game, index) => {
+        // Create a .game-item wrapper
+        const gameItem = document.createElement('div');
+        gameItem.className = 'game-item';
 
-				// Toggle checkbox when clicking anywhere on the card (except the native checkbox)
-				gameItem.addEventListener('click', function(e) {
-					if (e.target !== checkbox) {
-						checkbox.checked = !checkbox.checked;
-						updateScore();
-					}
-				});
+        // Create a unique ID for each checkbox
+        const inputId = `${containerId}-game-${index}`;
 
-				// Also fire updateScore when user clicks the checkbox directly
-				checkbox.addEventListener('change', updateScore);
-			});
-		}
+        // Insert checkbox + label HTML
+        gameItem.innerHTML = `
+          <div class="game-checkbox">
+            <input type="checkbox" id="${inputId}">
+            <label for="${inputId}">${game}</label>
+          </div>
+        `;
+        grid.appendChild(gameItem);
 
-        function updateScore() {
-            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-            const checkedBoxes = document.querySelectorAll('input[type="checkbox"]:checked');
-            
-            score = checkedBoxes.length;
-            const percentage = Math.round((score / totalGames) * 100);
-            
-            // Update score display
-            document.getElementById('score').textContent = score;
-            document.getElementById('checkedCount').textContent = score;
-            document.getElementById('percentage').textContent = percentage + '%';
-            document.getElementById('remainingCount').textContent = totalGames - score;
-            
-            // Update progress bar
-            const progressFill = document.getElementById('progressFill');
-            progressFill.style.width = percentage + '%';
-            
-            // Update visual feedback for checked items
-            checkboxes.forEach((checkbox) => {
-                const gameItem = checkbox.closest('.game-item');
-                if (checkbox.checked) {
-                    gameItem.classList.add('checked');
-                } else {
-                    gameItem.classList.remove('checked');
-                }
-            });
-            
-            // Show celebration for milestones
-            if (score > 0 && score % 20 === 0) {
-				const celebration = getCelebrationMessage(score);
-				if (celebration) {
-					celebrationQueue.push({
-						message: celebration.message,
-						duration: celebration.duration,
-						isFinal: score === totalGames  // now 200
-					});
-					processCelebrationQueue();
-				}
-			}
+        // Grab references to the checkbox + its label
+        const checkbox = gameItem.querySelector('input[type="checkbox"]');
+        const label    = gameItem.querySelector('label');
+
+        // Prevent the card’s click handler when clicking on the label
+        label.addEventListener('click', function(e) {
+          e.stopPropagation();
+        });
+
+        // Toggle checkbox when clicking anywhere on the card (except the native checkbox)
+        gameItem.addEventListener('click', function(e) {
+          if (e.target !== checkbox) {
+            checkbox.checked = !checkbox.checked;
+            updateScore();
+          }
+        });
+
+        // Also fire updateScore when user clicks the checkbox directly
+        checkbox.addEventListener('change', updateScore);
+      });
+    }
+
+    // 3) Celebration + confetti queue logic
+    let celebrationQueue = [];
+    let isCelebrating = false;
+
+    /**
+     * Returns a celebration message object for every 20-game milestone up to 200.
+     * @param {number} score – The current number of checked boxes
+     * @returns {object|null}
+     */
+    function getCelebrationMessage(score) {
+      const celebrations = {
+        20:  { message: '🎮 Gaming Rookie!',      duration: 2000 },
+        40:  { message: '🕹️ Player Level Up!',     duration: 2500 },
+        60:  { message: '🎯 Arcade Master!',       duration: 3000 },
+        80:  { message: '🏆 Console Champion!',    duration: 3500 },
+        100: { message: '🌟 Halfway Hero!',        duration: 4000 },
+        120: { message: '🚀 Gaming Veteran!',      duration: 4500 },
+        140: { message: '👑 Elite Gamer!',         duration: 5000 },
+        160: { message: '🔥 Legendary Player!',    duration: 5500 },
+        180: { message: '💎 Gaming God!',          duration: 6000 },
+        200: { message: '🏆🎮 ULTIMATE GAMER! 🎮🏆', duration: 8000 }
+      };
+      return celebrations[score] || null;
+    }
+
+    /**
+     * Processes the celebration queue, showing one pop‐up after the previous finishes.
+     */
+    function processCelebrationQueue() {
+      if (isCelebrating || celebrationQueue.length === 0) return;
+
+      const { message, duration, isFinal } = celebrationQueue.shift();
+      isCelebrating = true;
+
+      const celebrationEl = document.getElementById('celebration');
+      celebrationEl.textContent = message;
+      celebrationEl.classList.add('show');
+
+      // Trigger confetti if this is the final milestone (200)
+      if (isFinal) {
+        launchConfetti();
+      }
+
+      // Hide after “duration” ms, then process next in queue
+      setTimeout(() => {
+        celebrationEl.classList.remove('show');
+        isCelebrating = false;
+        // Give CSS transition (0.5s) a moment to finish hiding
+        setTimeout(() => {
+          processCelebrationQueue();
+        }, 500);
+      }, duration);
+    }
+
+    /**
+     * Launches a simple confetti animation behind the “ULTIMATE GAMER!” message.
+     */
+    function launchConfetti() {
+      const canvas = document.createElement('canvas');
+      canvas.id = 'confettiCanvas';
+      canvas.style.position = 'fixed';
+      canvas.style.top = 0;
+      canvas.style.left = 0;
+      canvas.style.width = '100%';
+      canvas.style.height = '100%';
+      canvas.style.pointerEvents = 'none';
+      canvas.style.zIndex = 999;
+      document.body.appendChild(canvas);
+
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const confettiPieces = [];
+      const colors = ['#FFC107', '#FF3D00', '#4CAF50', '#2196F3', '#E91E63'];
+
+      // Create 150 small confetti rectangles
+      for (let i = 0; i < 150; i++) {
+        confettiPieces.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height - canvas.height,
+          w: 8 + Math.random() * 8,
+          h: 4 + Math.random() * 4,
+          vx: -2 + Math.random() * 4,
+          vy: 2 + Math.random() * 6,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          rot: Math.random() * 2 * Math.PI,
+          rotSpeed: (-0.04 + Math.random() * 0.08)
+        });
+      }
+
+      let animationFrame;
+      function update() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        confettiPieces.forEach((p) => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.rot += p.rotSpeed;
+
+          // Draw each piece as a rotated rectangle
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+          ctx.restore();
+
+          // Reset if it falls below the screen
+          if (p.y > canvas.height) {
+            p.y = -10;
+            p.x = Math.random() * canvas.width;
+          }
+        });
+        animationFrame = requestAnimationFrame(update);
+      }
+
+      // Start the animation
+      update();
+
+      // Stop and remove canvas after 7 seconds
+      setTimeout(() => {
+        cancelAnimationFrame(animationFrame);
+        document.body.removeChild(canvas);
+      }, 7000);
+    }
+
+    /**
+     * Updates the score, percentage, remaining count, progress bar,
+     * highlights checked items, and enqueues any milestone celebrations.
+     */
+    function updateScore() {
+      const checkedBoxes = document.querySelectorAll('input[type="checkbox"]:checked');
+      score = checkedBoxes.length;
+      const percentage = Math.round((score / totalGames) * 100);
+
+      // Update the three elements in the sticky score display
+      document.getElementById('percentage').textContent = percentage + '%';
+      document.getElementById('score').textContent = score;
+      document.getElementById('remainingCount').textContent = totalGames - score;
+
+      // Update progress bar width
+      document.getElementById('progressFill').style.width = percentage + '%';
+
+      // Highlight or un-highlight each .game-item based on its checked state
+      document.querySelectorAll('input[type="checkbox"]').forEach((checkbox) => {
+        const gameItem = checkbox.closest('.game-item');
+        if (checkbox.checked) {
+          gameItem.classList.add('checked');
+        } else {
+          gameItem.classList.remove('checked');
         }
+      });
 
-        function getCelebrationMessage(score) {
-			const celebrations = {
-				20:  { message: '🎮 Gaming Rookie!',      duration: 2000 },
-				40:  { message: '🕹️ Player Level Up!',     duration: 2500 },
-				60:  { message: '🎯 Arcade Master!',       duration: 3000 },
-				80:  { message: '🏆 Console Champion!',    duration: 3500 },
-				100: { message: '🌟 Halfway Hero!',        duration: 4000 },
-				120: { message: '🚀 Gaming Veteran!',      duration: 4500 },
-				140: { message: '👑 Elite Gamer!',         duration: 5000 },
-				160: { message: '🔥 Legendary Player!',    duration: 5500 },
-				180: { message: '💎 Gaming God!',          duration: 6000 },
-				200: { message: '🏆🎮 ULTIMATE GAMER! 🎮🏆', duration: 8000 }
-			};
-			return celebrations[score] || null;
-		}
+      // Every 20 checked boxes triggers a celebration
+      if (score > 0 && score % 20 === 0) {
+        const celebration = getCelebrationMessage(score);
+        if (celebration) {
+          celebrationQueue.push({
+            message: celebration.message,
+            duration: celebration.duration,
+            isFinal: score === totalGames  // triggers confetti at 200
+          });
+          processCelebrationQueue();
+        }
+      }
+    }
 
-		// 3) Create a function to process the queue:
-		function processCelebrationQueue() {
-			if (isCelebrating || celebrationQueue.length === 0) return;
+    // 4) When the page loads: populate both grids and wire up tabs
+    document.addEventListener('DOMContentLoaded', function() {
+      // Populate AAA grid
+      createGameItems('AAAcontainer', aaaGames);
 
-			const { message, duration, isFinal } = celebrationQueue.shift();
-			isCelebrating = true;
+      // Populate Indie grid
+      createGameItems('Indiecontainer', indieGames);
 
-			// Show the overlay
-			const celebrationEl = document.getElementById('celebration');
-			celebrationEl.textContent = message;
-			celebrationEl.classList.add('show');
+      // Initialize display
+      updateScore();
 
-			// If this is the 100th celebration, also fire confetti:
-			if (isFinal) {
-				launchConfetti();
-			}
+      // Tab‐switch: show AAA, hide Indie
+      document.getElementById('tabAAA').addEventListener('click', function() {
+        document.getElementById('AAAcontainer').style.display = 'block';
+        document.getElementById('Indiecontainer').style.display = 'none';
+        this.classList.add('active');
+        document.getElementById('tabIndie').classList.remove('active');
+      });
 
-			// After 'duration' ms, hide and then process next
-			setTimeout(() => {
-				celebrationEl.classList.remove('show');
-				isCelebrating = false;
-				// Give the CSS transition (0.5s) a moment to finish hiding
-				setTimeout(() => {
-					processCelebrationQueue();
-				}, 500);
-			}, duration);
-		}
-			
-		// 6) Finally, add a simple confetti launcher. Insert this function anywhere below (still inside <script>):
-		function launchConfetti() {
-			// Create a full‐screen <canvas> to draw confetti
-			const canvas = document.createElement('canvas');
-			canvas.id = 'confettiCanvas';
-			canvas.style.position = 'fixed';
-			canvas.style.top = 0;
-			canvas.style.left = 0;
-			canvas.style.width = '100%';
-			canvas.style.height = '100%';
-			canvas.style.pointerEvents = 'none';
-			canvas.style.zIndex = 999;
-			document.body.appendChild(canvas);
-
-			const ctx = canvas.getContext('2d');
-			canvas.width = window.innerWidth;
-			canvas.height = window.innerHeight;
-
-			const confettiPieces = [];
-			const colors = ['#FFC107', '#FF3D00', '#4CAF50', '#2196F3', '#E91E63'];
-
-			// Create 150 small rectangles with random positions, velocities, and colors
-			for (let i = 0; i < 150; i++) {
-				confettiPieces.push({
-					x: Math.random() * canvas.width,
-					y: Math.random() * canvas.height - canvas.height,
-					w: 8 + Math.random() * 8,
-					h: 4 + Math.random() * 4,
-					vx: -2 + Math.random() * 4,
-					vy: 2 + Math.random() * 6,
-					color: colors[Math.floor(Math.random() * colors.length)],
-					rot: Math.random() * 2 * Math.PI,
-					rotSpeed: (-0.04 + Math.random() * 0.08)
-				});
-			}
-
-			let animationFrame;
-			function update() {
-				ctx.clearRect(0, 0, canvas.width, canvas.height);
-				confettiPieces.forEach((p) => {
-					p.x += p.vx;
-					p.y += p.vy;
-					p.rot += p.rotSpeed;
-
-					// Draw each piece as a rotated rectangle
-					ctx.save();
-					ctx.translate(p.x, p.y);
-					ctx.rotate(p.rot);
-					ctx.fillStyle = p.color;
-					ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
-					ctx.restore();
-
-					// Reset if it falls below the screen
-					if (p.y > canvas.height) {
-						p.y = -10;
-						p.x = Math.random() * canvas.width;
-					}
-				});
-				animationFrame = requestAnimationFrame(update);
-			}
-
-			// Start the animation
-			update();
-
-			// Stop and remove canvas after 7 seconds
-			setTimeout(() => {
-				cancelAnimationFrame(animationFrame);
-				document.body.removeChild(canvas);
-			}, 7000);
-		}
-
-		document.addEventListener('DOMContentLoaded', function() {
-			// Populate the AAA tab
-			createGameItems('AAAcontainer', aaaGames);
-
-			// Populate the Indie tab
-			createGameItems('Indiecontainer', indieGames);
-
-			// Initialize score (0/total)
-			updateScore();
-
-			// Wire up tab‐switching logic:
-			document.getElementById('tabAAA').addEventListener('click', function() {
-				document.getElementById('AAAcontainer').style.display = 'block';
-				document.getElementById('Indiecontainer').style.display = 'none';
-				this.classList.add('active');
-				document.getElementById('tabIndie').classList.remove('active');
-			});
-
-			document.getElementById('tabIndie').addEventListener('click', function() {
-				document.getElementById('AAAcontainer').style.display = 'none';
-				document.getElementById('Indiecontainer').style.display = 'block';
-				this.classList.add('active');
-				document.getElementById('tabAAA').classList.remove('active');
-			});
-		});
-
-    </script>
+      // Tab‐switch: show Indie, hide AAA
+      document.getElementById('tabIndie').addEventListener('click', function() {
+        document.getElementById('AAAcontainer').style.display = 'none';
+        document.getElementById('Indiecontainer').style.display = 'block';
+        this.classList.add('active');
+        document.getElementById('tabAAA').classList.remove('active');
+      });
+    });
+  </script>
 </body>
 </html>
