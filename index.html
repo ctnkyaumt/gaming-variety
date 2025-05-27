@@ -231,6 +231,37 @@
 			margin-bottom: 15px;    /* ← new: pushes the game grid down */
 			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 		}
+		
+		/* === TABS STYLE === */
+		.tabs {
+			display: flex;
+			justify-content: center;
+			margin-top: 20px;
+			margin-bottom: 15px;
+			gap: 10px;
+		}
+
+		.tab-button {
+			background: #f0f0f0;
+			border: 2px solid #ccc;
+			border-radius: 8px;
+			padding: 8px 16px;
+			font-size: 1rem;
+			font-weight: 500;
+			cursor: pointer;
+			transition: background 0.2s, border-color 0.2s;
+		}
+
+		.tab-button:hover {
+			background: #e8e8e8;
+		}
+
+		.tab-button.active {
+			background: #667eea;       /* match your header gradient’s main color */
+			border-color: #4ecdc4;     /* or whichever accent you prefer */
+			color: #fff;
+		}
+
     </style>
 </head>
 <body>
@@ -238,6 +269,11 @@
         <div class="header">
             <h1 class="title">What is your VARIETY gamer score?</h1>
             <p class="subtitle">Which of these Video Game series did you play (at least 1 game of)? 1 point per box checked!</p>
+			<!-- TABS: AAA vs. Indie -->
+			<div class="tabs">
+				<button id="tabAAA" class="tab-button active">AAA</button>
+				<button id="tabIndie" class="tab-button">Indie</button>
+			</div>
         </div>
 
         <div class="sticky-header">
@@ -251,10 +287,19 @@
 			</div>
 		</div>
 
+        <!-- AAA CONTAINER -->
+		<div id="AAAcontainer">
+			<div class="games-grid" id="gamesGrid">
+				<!-- (existing AAA items will be populated here via JavaScript) -->
+			</div>
+		</div>
 
-        <div class="games-grid" id="gamesGrid">
-            <!-- Games will be populated by JavaScript -->
-        </div>
+		<!-- INDIE CONTAINER (initially hidden) -->
+		<div id="Indiecontainer" style="display: none;">
+			<div class="games-grid" id="indieGrid">
+				<!-- (“Indie” checkboxes will be populated here via JavaScript) -->
+			</div>
+		</div>
 
         <div class="stats">
             <div class="stat-item">
@@ -275,77 +320,116 @@
     <div class="celebration" id="celebration">🎮✨</div>
 
     <script>
-        const games = [
-            "Mario Bros.", "Final Fantasy", "Dragon Quest", "Mortal Kombat",
-            "Legend of Zelda", "Pikmin", "Halo", "Megaman",
-            "Pokémon", "Tales of...", "GTA", "Uncharted",
-            "Warcraft", "Of Mana", "Diablo", "Tomb Raider",
-            "The Elder Scrolls", "Metal Gear", "Assassin's Creed", "Portal",
-            "Fallout", "God Of War", "Metroid", "Sonic the Hedgehog",
-            "Doom", "Tetris", "Bioshock", "The Witcher",
-            "Kingdom Hearts", "Red Dead Redemp.", "Mass Effect", "Half-Life",
-            "Crash Bandicoot", "Street Fighter", "Star Fox", "Spyro the Dragon",
-            "Donkey Kong", "Chrono Series", "Last of Us", "Dark Souls",
-            "Tekken", "Rachet and Clank", "Fire Emblem", "Devil May Cry",
-            "Borderlands", "Call of Duty", "Far Cry", "Silent Hill",
-            "The Sims", "Age of Empires", "Resident Evil", "Hitman",
-            "Dead Space", "Need for Speed", "Tony Hawk Pro.", "Dragon Age",
-            "Animal Crossing", "Harvest Moon", "Gran Turismo", "Gears of War",
-            "Fable", "Prince of Persia", "Rayman", "Banjo-Kazooie",
-            "Contra", "Max Payne", "Castlevania", "Counter-Strike",
-            "Team Fortress", "Ninja Gaiden", "Soul Calibur", "Worms",
-            "Punch-Out", "Persona", "SMT", "Shadow Hearts",
-            "Saints Row", "Bayonetta", "Yakuza", "Bomberman",
-            "Jak and Daxter", "Medal of Honor", "Com. and Conq.", "Monster Hunter",
-            "Guilty Gear", "Dead or Alive", "SaGa", "Shenmue",
-            "Starcraft", "Deus Ex", "Total War", "Watch Dogs",
-            "Nier", "Drakengard", "Phantasy Star", "Dishonored",
-            "Warhammer", "Breath of Fire", "Parasite Eve", "Wild Arms"
-        ];
+        // 1) TWO SEPARATE ARRAYS: AAA vs. Indie
+		const aaaGames = [
+			"Mario Bros.", "Final Fantasy", "Dragon Quest", "Mortal Kombat",
+			"Legend of Zelda", "Pikmin", "Halo", "Megaman",
+			"Pokémon", "Tales of...", "GTA", "Uncharted",
+			"Warcraft", "Of Mana", "Diablo", "Tomb Raider",
+			"The Elder Scrolls", "Metal Gear", "Assassin's Creed", "Portal",
+			"Fallout", "God Of War", "Metroid", "Sonic the Hedgehog",
+			"Doom", "Tetris", "Bioshock", "The Witcher",
+			"Kingdom Hearts", "Red Dead Redemp.", "Mass Effect", "Half-Life",
+			"Crash Bandicoot", "Street Fighter", "Star Fox", "Spyro the Dragon",
+			"Donkey Kong", "Chrono Series", "Last of Us", "Dark Souls",
+			"Tekken", "Rachet and Clank", "Fire Emblem", "Devil May Cry",
+			"Borderlands", "Call of Duty", "Far Cry", "Silent Hill",
+			"The Sims", "Age of Empires", "Resident Evil", "Hitman",
+			"Dead Space", "Need for Speed", "Tony Hawk Pro.", "Dragon Age",
+			"Animal Crossing", "Harvest Moon", "Gran Turismo", "Gears of War",
+			"Fable", "Prince of Persia", "Rayman", "Banjo-Kazooie",
+			"Contra", "Max Payne", "Castlevania", "Counter-Strike",
+			"Team Fortress", "Ninja Gaiden", "Soul Calibur", "Worms",
+			"Punch-Out", "Persona", "SMT", "Shadow Hearts",
+			"Saints Row", "Bayonetta", "Yakuza", "Bomberman",
+			"Jak and Daxter", "Medal of Honor", "Com. and Conq.", "Monster Hunter",
+			"Guilty Gear", "Dead or Alive", "SaGa", "Shenmue",
+			"Starcraft", "Deus Ex", "Total War", "Watch Dogs",
+			"Nier", "Drakengard", "Phantasy Star", "Dishonored",
+			"Warhammer", "Breath of Fire", "Parasite Eve", "Wild Arms"
+		];
 
-        let score = 0;
+		const indieGames = [
+			"Fez", "Super Meat Boy", "VA-11 HALL-A", "Devil Daggers", "Overcooked",
+			"Towerfall", "Observer", "Slime Rancher", "No Man’s Sky", "Oxenfree",
+			"Superhot", "Thomas Was Alone", "Steamworld", "A Hat in Time", "Hades",
+			"Hollow Knight", "Terraria", "Path of Exile", "Cave Story", "Don’t Starve",
+			"Bastion", "Coffee Talk", "Braid", "Darkest Dungeon", "Castle Crashers",
+
+			"Machinarium", "World of Goo", "Audiosurf", "Frog Detective", "Amnesia",
+			"Binding of Isaac", "The Banner Saga", "Dead Cells", "Subnautica",
+			"Super Hexagon", "Behind the Frame", "Slay the Spire", "Cuphead",
+			"Among Us", "The Messenger", "Night in the Woods", "Ape Out",
+			"Rocket League", "Firewatch", "Skullgirls", "Unpacking", "Katana Zero",
+			"Stardew Valley", "Bloodstained", "Townscaper",
+
+			"Nidhogg", "Limbo", "Mount And Blade", "Disco Elysium", "FTL",
+			"Guacamelee", "Hyper Light Drifter", "Mighty No. 9", "Yuppie Psycho",
+			"Gone Home", "Papers, Please", "Hotline Miami", "Divinity", "A Way Out",
+			"Paradise Killer", "Fall Guys", "Minecraft", "Spelunky", "Furi",
+			"Monster Prom", "Yume Nikki", "Dear Esther", "Outer Wilds", "Armello",
+
+			"Boyfriend Dungeon", "Pathologic", "Rain World", "Calico", "Edith Finch",
+			"Untitled Goose Game", "Journey", "Getting Over It", "Celeste", "Undertale",
+			"Phasmophobia", "The Stanley Parable", "Shovel Knight", "Devotion",
+			"Kerbal Space Program", "PUBG", "Beat Saber", "Mutazione",
+			"Salt & Sanctuary", "Five Nights at Freddy’s", "Garry’s Mod",
+			"Inscryption", "Helltaker", "A Short Hike", "PowerWash Simulator"
+		];
+
+		// 2) GLOBAL SCORE VARIABLES (unchanged logic)
+		let score = 0;
+		const totalGames = aaaGames.length + indieGames.length;
 		let celebrationQueue = [];
 		let isCelebrating = false;
-        const totalGames = games.length;
 
-        function createGameItems() {
-            const gamesGrid = document.getElementById('gamesGrid');
-            
-            games.forEach((game, index) => {
-                const gameItem = document.createElement('div');
-                gameItem.className = 'game-item';
-                
-                gameItem.innerHTML = `
-                    <div class="game-checkbox">
-                        <input type="checkbox" id="game-${index}">
-                        <label for="game-${index}">${game}</label>
-                    </div>
-                `;
-                
-                // Append to grid
-                gamesGrid.appendChild(gameItem);
+        /**
+		 * Creates a grid of checkboxes inside the given container ID.
+		 * @param {string} containerId   – The ID of the DIV that wraps a .games-grid
+		 * @param {string[]} listOfGames – The array of game‐names to turn into checkboxes
+		 */
+		function createGameItems(containerId, listOfGames) {
+			const gridWrapper = document.getElementById(containerId);
+			const grid = gridWrapper.querySelector('.games-grid');
 
-                // Make the entire .game-item clickable
-                const checkbox = gameItem.querySelector('input[type="checkbox"]');
-                const label = gameItem.querySelector('label');
+			listOfGames.forEach((game, index) => {
+				// Create a .game-item wrapper
+				const gameItem = document.createElement('div');
+				gameItem.className = 'game-item';
 
-                // Prevent the card’s click handler from firing when clicking on the label
-                label.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                });
+				// Create a unique ID for each checkbox
+				const inputId = `${containerId}-game-${index}`;
 
-                // Toggle checkbox when anywhere on the card is clicked (excluding direct clicks on the native checkbox)
-                gameItem.addEventListener('click', function(e) {
-                    if (e.target !== checkbox) {
-                        checkbox.checked = !checkbox.checked;
-                        updateScore();
-                    }
-                });
+				// Insert checkbox + label HTML
+				gameItem.innerHTML = `
+					<div class="game-checkbox">
+						<input type="checkbox" id="${inputId}">
+						<label for="${inputId}">${game}</label>
+					</div>
+				`;
+				grid.appendChild(gameItem);
 
-                // Also update visual feedback if the user clicks directly on the checkbox
-                checkbox.addEventListener('change', updateScore);
-            });
-        }
+				// Grab references to the checkbox + its label
+				const checkbox = gameItem.querySelector('input[type="checkbox"]');
+				const label    = gameItem.querySelector('label');
+
+				// Prevent card‐click handler when clicking directly on the label
+				label.addEventListener('click', function(e) {
+					e.stopPropagation();
+				});
+
+				// Toggle checkbox when clicking anywhere on the card (except the native checkbox)
+				gameItem.addEventListener('click', function(e) {
+					if (e.target !== checkbox) {
+						checkbox.checked = !checkbox.checked;
+						updateScore();
+					}
+				});
+
+				// Also fire updateScore when user clicks the checkbox directly
+				checkbox.addEventListener('change', updateScore);
+			});
+		}
 
         function updateScore() {
             const checkboxes = document.querySelectorAll('input[type="checkbox"]');
@@ -375,13 +459,13 @@
             });
             
             // Show celebration for milestones
-            if (score > 0 && score % 10 === 0) {
+            if (score > 0 && score % 20 === 0) {
 				const celebration = getCelebrationMessage(score);
 				if (celebration) {
 					celebrationQueue.push({
 						message: celebration.message,
 						duration: celebration.duration,
-						isFinal: score === 100
+						isFinal: score === totalGames  // now 200
 					});
 					processCelebrationQueue();
 				}
@@ -390,16 +474,16 @@
 
         function getCelebrationMessage(score) {
 			const celebrations = {
-            10: { message: '🎮 Gaming Rookie!', duration: 2000 },
-            20: { message: '🕹️ Player Level Up!', duration: 2500 },
-            30: { message: '🎯 Arcade Master!', duration: 3000 },
-            40: { message: '🏆 Console Champion!', duration: 3500 },
-            50: { message: '🌟 Halfway Hero!', duration: 4000 },
-            60: { message: '🚀 Gaming Veteran!', duration: 4500 },
-            70: { message: '👑 Elite Gamer!', duration: 5000 },
-            80: { message: '🔥 Legendary Player!', duration: 5500 },
-            90: { message: '💎 Gaming God!', duration: 6000 },
-            100: { message: '🏆🎮 ULTIMATE GAMER! 🎮🏆', duration: 8000 }
+				20:  { message: '🎮 Gaming Rookie!',      duration: 2000 },
+				40:  { message: '🕹️ Player Level Up!',     duration: 2500 },
+				60:  { message: '🎯 Arcade Master!',       duration: 3000 },
+				80:  { message: '🏆 Console Champion!',    duration: 3500 },
+				100: { message: '🌟 Halfway Hero!',        duration: 4000 },
+				120: { message: '🚀 Gaming Veteran!',      duration: 4500 },
+				140: { message: '👑 Elite Gamer!',         duration: 5000 },
+				160: { message: '🔥 Legendary Player!',    duration: 5500 },
+				180: { message: '💎 Gaming God!',          duration: 6000 },
+				200: { message: '🏆🎮 ULTIMATE GAMER! 🎮🏆', duration: 8000 }
 			};
 			return celebrations[score] || null;
 		}
@@ -503,11 +587,32 @@
 			}, 7000);
 		}
 
-		// Initialize the page
 		document.addEventListener('DOMContentLoaded', function() {
-			createGameItems();
+			// Populate the AAA tab
+			createGameItems('AAAcontainer', aaaGames);
+
+			// Populate the Indie tab
+			createGameItems('Indiecontainer', indieGames);
+
+			// Initialize score (0/total)
 			updateScore();
+
+			// Wire up tab‐switching logic:
+			document.getElementById('tabAAA').addEventListener('click', function() {
+				document.getElementById('AAAcontainer').style.display = 'block';
+				document.getElementById('Indiecontainer').style.display = 'none';
+				this.classList.add('active');
+				document.getElementById('tabIndie').classList.remove('active');
+			});
+
+			document.getElementById('tabIndie').addEventListener('click', function() {
+				document.getElementById('AAAcontainer').style.display = 'none';
+				document.getElementById('Indiecontainer').style.display = 'block';
+				this.classList.add('active');
+				document.getElementById('tabAAA').classList.remove('active');
+			});
 		});
+
     </script>
 </body>
 </html>
